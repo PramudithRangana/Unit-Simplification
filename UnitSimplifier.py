@@ -1,6 +1,7 @@
 from itertools import groupby
 from AccessoriesFile import scriptChanger as scrC, listFormatter as lF, DivisionSolving as devS
 
+
 unit_list = ['K', 'm', 's', 'km', 'N', 'J', 'kg', 'cm']
 
 
@@ -9,20 +10,17 @@ class UnitSimplifying:
         self.unit = unit
         self.result = None
 
-        self.simplified()
+        self.main()
 
-    def items_grouping(self):
+    def items_group(self):
         # unit string set grouping as alphabets and powers
         return lF.str_grouper(self.unit)
 
     def unit_separate(self):
-        # get grouped string
-        gl = self.items_grouping()
-
         # power set to the grouped units
-        return lF.power_setting(gl)
+        return lF.power_setter(self.items_group())
 
-    def unit_grouping(self):
+    def unit_group(self):
         separating_units = self.unit_separate()
 
         # Units grouping with their (super scripted) powers as a nested list
@@ -37,27 +35,19 @@ class UnitSimplifying:
 
         return separating_units
 
-    def unit_simple(self):
-        nested_li = self.unit_grouping()
-
+    def ResultFinalize(self):
         # scripted values change as a normal values
-        nm_l = [[s[0]] + [(scrC.supScr_to_norm(s[1]))] if len(s) > 1 else [s[0], 1] for s in nested_li]
-
-        # units simplification
-        simplify = lF.unit_simplifier(nm_l)
+        nom_list = [[s[0]] + [(scrC.supScr_to_norm(s[1]))] if len(s) > 1 else [s[0], 1] for s in self.unit_group()]
 
         # scripted to normal values
-        return [s[0] if s[1] == 1 else [s[0]] + [(scrC.norm_to_supScr(s[1]))] for s in simplify]
-
-    def item_joining(self):
-        us = self.unit_simple()
+        powCal = [s[0] if s[1] == 1 else [s[0]] + [(scrC.norm_to_supScr(s[1]))] for s in lF.Simplifier(nom_list)]
 
         # alternate from nested style to flat style
-        flatList = [element for innerList in us for element in innerList]
+        ResultInList = [element for innerList in powCal for element in innerList]
 
-        return ''.join([i for i in flatList])
+        return ''.join([i for i in ResultInList])
 
-    def simplified(self):
+    def main(self):
         # control the function
         if '/' in self.unit:
             split_str = self.unit.split('/')
@@ -65,10 +55,31 @@ class UnitSimplifying:
             divide = devS.division_solve(split_str[1])
             self.unit = split_str[0] + divide
 
-            self.result = self.item_joining()
+            # get simplified result
+            self.result = self.ResultFinalize()
 
+        elif '+' or '-' in self.unit:
+            cal_list = []
+            if '+' in self.unit:
+                split_str = self.unit.split('+')
+                for s in split_str:
+                    self.unit = s.strip()
+                    cal_list.append(self.ResultFinalize())
+
+                # get simplified result
+                self.result = ' + '.join(u for u in cal_list)
+            else:
+                split_str = self.unit.split('-')
+
+                for s in split_str:
+                    self.unit = s.strip()
+                    cal_list.append(self.ResultFinalize())
+
+                # get simplified result
+                self.result = ' - '.join(u for u in cal_list)
         else:
-            self.result = self.item_joining()
+            # get simplified result
+            self.result = self.ResultFinalize()
 
     def __str__(self):
         return self.result

@@ -10,6 +10,8 @@ def str_grouper(input_string):
     grouped_list = [''.join(g) for _, g in groupby(input_string, str.isalpha)]
 
     return grouped_list
+
+
 # output --> ['Nm', '⁻²⁴', 'kJs', '⁻¹', 'km', '²¹', 'm', '⁻²']
 
 
@@ -53,18 +55,43 @@ def unit_separator(grouped_list):
 
 
 # input --> ['N', 'm', '⁻²⁴', 'kJ', 's', '⁻¹', 'km', '⁻²¹', 'm', '⁻²']
-def power_setting(grouped_list):
-    usr = unit_separator(grouped_list)
-    powerSetter = lambda sep='\n': ''.join((sep + x if x.isalpha() else x) for x in usr).split(sep)[1:]
+def power_setter(grouped_list):
+    powerSetter = lambda sep='\n': ''.join((sep + x if x.isalpha() else x)
+                                           for x in unit_separator(grouped_list)).split(sep)[1:]
     return powerSetter()
 # output --> ['N', 'm⁻²⁴', 'kJ', 's⁻¹', 'km⁻²¹', 'm⁻²']
 
 
+# input --> ['A', 'B', '2', 'C', '3', 'D', '4', 'E', 'B', '2', 'F', '6', 'D', 'C', '3', 'B']
+def default_value_setter(my_list):
+    def_setter = []
+    i = 0
+    while i < len(my_list):
+        # if last item is a letter, then set (super scripted) 1 as an indices
+        if i + 1 == len(my_list):
+            if my_list[i].isalpha():
+                def_setter.append([my_list[i], '¹'])
+                break
+        prev, cur = my_list[i], my_list[i + 1]
+
+        if cur.isalpha():
+            # set default value as (super scripted) 1
+            def_setter.append([prev, '¹'])
+            i += 1
+        else:
+            # set numeric values belongs to the letter together for creating nested list
+            def_setter.append([prev, cur])
+            i += 2
+    return def_setter
+# output --> [['A', '*'], ['B', '2'], ['C', '3'], ['D', '4'], ['E', '*'], ['B', '2'], ['F', '6'], ['D', '*'], ['C',
+#                                                                                                      '3'], ['B', '*']]
+
+
 # input --> [['N', '1'], ['m', '-24'], ['km', '-1'], ['s', '-1'], ['m', '2'], ['N', '-1'], ['s', '-1'], ['m', '2']]
-def unit_simplifier(my_list):
+def Simplifier(toSimple):
     measuring_unit_dict = {}
 
-    for item in my_list:
+    for item in toSimple:
         key = item[0]
         value = '1' if len(item) == 1 else item[1]
 
@@ -84,29 +111,5 @@ def unit_simplifier(my_list):
                 measuring_unit_dict[key] = value
 
     return list(measuring_unit_dict.items())
+
 # input --> [('m', -20), ('km', '-1'), ('s', -2)]
-
-
-# input --> ['A', 'B', '2', 'C', '3', 'D', '4', 'E', 'B', '2', 'F', '6', 'D', 'C', '3', 'B']
-def default_value_setter(my_list):
-    def_setter = []
-    i = 0
-    while i < len(my_list):
-        # if last item is a letter, then set (super scripted) 1 as a indices
-        if i + 1 == len(my_list):
-            if my_list[i].isalpha():
-                def_setter.append([my_list[i], '¹'])
-                break
-        prev, cur = my_list[i], my_list[i + 1]
-
-        if cur.isalpha():
-            # set default value as (super scripted) 1
-            def_setter.append([prev, '¹'])
-            i += 1
-        else:
-            # set numeric values belongs to the letter together for creating nested list
-            def_setter.append([prev, cur])
-            i += 2
-    return def_setter
-# output --> [['A', '*'], ['B', '2'], ['C', '3'], ['D', '4'], ['E', '*'], ['B', '2'], ['F', '6'], ['D', '*'], ['C',
-#                                                                                                      '3'], ['B', '*']]
