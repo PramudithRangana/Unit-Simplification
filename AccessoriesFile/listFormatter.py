@@ -10,8 +10,6 @@ def str_grouper(input_string):
     grouped_list = [''.join(g) for _, g in groupby(input_string, str.isalpha)]
 
     return grouped_list
-
-
 # output --> ['Nm', '⁻²⁴', 'kJs', '⁻¹', 'km', '²¹', 'm', '⁻²']
 
 
@@ -55,10 +53,9 @@ def unit_separator(grouped_list):
 
 
 # input --> ['N', 'm', '⁻²⁴', 'kJ', 's', '⁻¹', 'km', '⁻²¹', 'm', '⁻²']
-def power_setter(grouped_list):
-    powerSetter = lambda sep='\n': ''.join((sep + x if x.isalpha() else x)
-                                           for x in unit_separator(grouped_list)).split(sep)[1:]
-    return powerSetter()
+def power_setter(grouped_list): return lambda sep='\n': ''.join((sep + x if x.isalpha() else x)
+                                                                for x in unit_separator(grouped_list)).split(sep)[1:]
+
 # output --> ['N', 'm⁻²⁴', 'kJ', 's⁻¹', 'km⁻²¹', 'm⁻²']
 
 
@@ -94,6 +91,7 @@ def Simplifier(toSimple):
     for item in toSimple:
         key = item[0]
         value = '1' if len(item) == 1 else item[1]
+        # print(f"key {key} | value {value}")
 
         # check either item exist or not in dictionary
         if key not in measuring_unit_dict.keys():

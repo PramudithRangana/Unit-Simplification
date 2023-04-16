@@ -6,7 +6,7 @@ def division_solve(input_string):
         # unit string set grouping as alphabets and powers
         grouped_list = lsF.str_grouper(input_string)
 
-        pow_set_list = lsF.power_setter(grouped_list)
+        pow_set_list = lsF.power_setter(grouped_list)()
 
         # Highlight - 1 -
         def_setter = [

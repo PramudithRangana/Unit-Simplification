@@ -1,6 +1,6 @@
 from itertools import groupby
 from AccessoriesFile import scriptChanger as scrC, listFormatter as lF, DivisionSolving as devS
-
+import re
 
 unit_list = ['K', 'm', 's', 'km', 'N', 'J', 'kg', 'cm']
 
@@ -18,7 +18,7 @@ class UnitSimplifying:
 
     def unit_separate(self):
         # power set to the grouped units
-        return lF.power_setter(self.items_group())
+        return lF.power_setter(self.items_group())()
 
     def unit_group(self):
         separating_units = self.unit_separate()
@@ -48,38 +48,36 @@ class UnitSimplifying:
         return ''.join([i for i in ResultInList])
 
     def main(self):
-        # control the function
-        if '/' in self.unit:
-            split_str = self.unit.split('/')
+        cal_list = []
 
-            divide = devS.division_solve(split_str[1])
-            self.unit = split_str[0] + divide
+        try:
+            # control the function
+            for st in [item.strip() for item in re.split(r" ", self.unit)]:
+                if st != '+' and st != '-':
+                    if '/' in st:
+                        split_str = st.split('/')
 
+                        divide = devS.division_solve(split_str[1])
+                        self.unit = split_str[0] + divide
+
+                        # get simplified result
+                        cal_list.append(self.ResultFinalize())
+
+                    else:
+                        self.unit = st
+
+                        # get simplified result
+                        cal_list.append(self.ResultFinalize())
+                else:
+                    # Append operators if existing
+                    cal_list.append(st)
+
+        except Exception as e:
+            raise e
+
+        finally:
             # get simplified result
-            self.result = self.ResultFinalize()
-
-        elif '+' or '-' in self.unit:
-            cal_list = []
-            if '+' in self.unit:
-                split_str = self.unit.split('+')
-                for s in split_str:
-                    self.unit = s.strip()
-                    cal_list.append(self.ResultFinalize())
-
-                # get simplified result
-                self.result = ' + '.join(u for u in cal_list)
-            else:
-                split_str = self.unit.split('-')
-
-                for s in split_str:
-                    self.unit = s.strip()
-                    cal_list.append(self.ResultFinalize())
-
-                # get simplified result
-                self.result = ' - '.join(u for u in cal_list)
-        else:
-            # get simplified result
-            self.result = self.ResultFinalize()
+            self.result = ' '.join(u for u in cal_list)
 
     def __str__(self):
         return self.result
